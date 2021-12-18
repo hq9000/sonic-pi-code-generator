@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Union, Optional, Type
+from typing import List, Optional, Type
 
 from sonic_pi_code_generator.lib.raw_ast import RawASTNode, VALUE_EMPTY
 import sys
@@ -57,6 +57,9 @@ class ASTNode(ABC):
 
         return this_raw_node
 
+    def _indent_lines(self, lines: List[str]) -> List[str]:
+        return ['  ' + line for line in lines]
+
 
 class StatementSequence(ASTNode):
 
@@ -66,8 +69,8 @@ class StatementSequence(ASTNode):
     def render_as_string(self) -> str:
         raise NotImplemented
 
-    def __init__(self, statements: List[ASTNode] = []):
-        self.statements: List[ASTNode] = statements
+    def __init__(self, statements: Optional[List[ASTNode]] = None):
+        self.statements: List[ASTNode] = [] if statements is None else statements
 
     def render_as_lines(self) -> List[str]:
         res = []
@@ -92,6 +95,24 @@ class UseSynth(ASTNode):
     def render_as_string(self) -> str:
         raise NotImplementedError()
 
+class Define(ASTNode):
+
+    def get_all_property_names(self) -> List[str]:
+        return ['name', 'statement_sequence']
+
+    def __init__(self, name: Optional[ASTNode] = None, statement_sequence: Optional[StatementSequence] = None):
+        self.name: Optional[ASTNode] = name
+        self.statement_sequence: Optional[StatementSequence] = statement_sequence
+
+    def render_as_lines(self) -> List[str]:
+        return [
+            f"define {self.name.render_as_string()} do",
+            *self._indent_lines(self.statement_sequence.render_as_lines()),
+            "done"
+        ]
+
+    def render_as_string(self) -> str:
+        return '\n'.join(self.render_as_lines())
 
 
 class StringLiteral(ASTNode):
