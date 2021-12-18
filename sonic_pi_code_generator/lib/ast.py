@@ -1,10 +1,18 @@
 from abc import ABC, abstractmethod
-from typing import List
-
-STATEMENT_SEQUENCE_INDENT = 2
+from typing import List, Union
 
 
 class ASTNode(ABC):
+    pass
+
+
+class Expression(ASTNode, ABC):
+    @abstractmethod
+    def render_as_string(self) -> str:
+        pass
+
+
+class Statement(ASTNode, ABC):
     @abstractmethod
     def render_as_lines(self) -> List[str]:
         pass
@@ -13,17 +21,9 @@ class ASTNode(ABC):
         return ['  ' + line for line in lines]
 
 
-class Expression(ASTNode, ABC):
-    pass
-
-
-class Statement(ASTNode, ABC):
-    pass
-
-
 class StatementSequence(ASTNode):
 
-    def __init__(self, statements: List[Statement] = []):
+    def __init__(self, statements: List[Statement]):
         self.statements: List[Statement] = statements
 
     def render_as_lines(self) -> List[str]:
@@ -57,6 +57,37 @@ class Define(Statement):
         ]
 
 
+class LValue(Expression):
 
-class DoBlock(ASTNode):
-    pass
+    def __init__(self, name: str):
+        self.name: str = name
+
+    def render_as_string(self) -> str:
+        return self.name
+
+class StringLiteral(Expression):
+    def __init__(self, value: str):
+        self.value: str = value
+
+    def render_as_string(self) -> str:
+        return self.value
+
+
+class NumericLiteral(Expression):
+    def __init__(self, value: Union[str, float]):
+        self.value: Union[str, float] = value
+
+    def render_as_string(self) -> str:
+        return str(self.value)
+
+
+class Assignment(Statement):
+
+    def __init__(self, lvalue: LValue, rvalue: Expression):
+        self.lvalue: LValue = lvalue
+        self.rvalue: Expression = rvalue
+
+    def render_as_lines(self) -> List[str]:
+        return [
+            self.lvalue.render_as_string() + " = " + self.rvalue.render_as_string()
+        ]
