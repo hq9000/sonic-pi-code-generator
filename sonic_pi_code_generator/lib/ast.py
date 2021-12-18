@@ -9,6 +9,9 @@ class ASTNode(ABC):
     def render_as_lines(self) -> List[str]:
         pass
 
+    def _indent(self, lines: List[str]) -> List[str]:
+        return ['  ' + line for line in lines]
+
 
 class Expression(ASTNode, ABC):
     pass
@@ -20,23 +23,14 @@ class Statement(ASTNode, ABC):
 
 class StatementSequence(ASTNode):
 
-    def __init__(self):
-        self.statements: List[Statement] = []
+    def __init__(self, statements: List[Statement] = []):
+        self.statements: List[Statement] = statements
 
     def render_as_lines(self) -> List[str]:
         res = []
         for statement in self.statements:
-            indent = ''
-            if isinstance(statement, StatementSequence):
-                indent = '  '
-
             lines = statement.render_as_lines()
-
-            if not indent:
-                # no additional indentation needed
-                res += lines
-            else:
-                res += [indent + line for line in lines]
+            res += lines
 
         return res
 
@@ -47,7 +41,21 @@ class UseSynth(Statement):
         self.synth_name: str = synth_name
 
     def render_as_lines(self) -> List[str]:
-        return [f"use synth {self.synth_name}"]
+        return [f"use synth :{self.synth_name}"]
+
+
+class Define(Statement):
+    def __init__(self, name: str, body: StatementSequence):
+        self.name: str = name
+        self.body: StatementSequence = body
+
+    def render_as_lines(self) -> List[str]:
+        return [
+            f"define :{self.name} do",
+            *self._indent(self.body.render_as_lines()),
+            "done"
+        ]
+
 
 
 class DoBlock(ASTNode):
