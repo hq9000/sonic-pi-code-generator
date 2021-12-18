@@ -1,6 +1,6 @@
 import unittest
 
-from sonic_pi_code_generator.lib.ast import StatementSequence, UseSynth, StringLiteral
+from sonic_pi_code_generator.lib.ast import StatementSequence, UseSynth, StringLiteral, ASTNodeFactory
 from sonic_pi_code_generator.lib.raw_ast import RawASTNode
 
 
@@ -20,6 +20,12 @@ class MyTestCase(unittest.TestCase):
 
         raw_ast = sequence.render_as_raw_ast_node()
         self.assertIsInstance(raw_ast, RawASTNode)
+
+        ast_factory = ASTNodeFactory()
+
+        restored = ast_factory.create_ast_node_by_raw(raw_ast)
+
+
         pass
 
 

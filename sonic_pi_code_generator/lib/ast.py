@@ -4,8 +4,8 @@ from typing import List, Union, Optional, Type
 from sonic_pi_code_generator.lib.raw_ast import RawASTNode, VALUE_EMPTY
 import sys
 
-RAW_NODE_TYPE_PREFIX_FOR_SCALARS = 'scarlar_'
-RAW_NODE_TYPE_PREFIX_FOR_ARRAYS = 'array_'
+RAW_NODE_TYPE_PREFIX_FOR_SCALARS = 'scalar_'
+RAW_NODE_TYPE_PREFIX_FOR_LISTS = 'list_'
 
 
 class ASTNode(ABC):
@@ -31,7 +31,7 @@ class ASTNode(ABC):
             parameter_raw_proxy_node = RawASTNode()
             this_raw_node.children.append(parameter_raw_proxy_node)
 
-            parameter_raw_proxy_node.type = property_name
+
             parameter_raw_proxy_node.value = VALUE_EMPTY
             parameter_raw_proxy_node.parent = this_raw_node
 
@@ -41,10 +41,14 @@ class ASTNode(ABC):
 
             if isinstance(property_value, ASTNode):
                 list_of_children: List[ASTNode] = [property_value]
+                raw_type_prefix = RAW_NODE_TYPE_PREFIX_FOR_SCALARS
             elif isinstance(property_value, list):
                 list_of_children: List[ASTNode] = property_value
+                raw_type_prefix = RAW_NODE_TYPE_PREFIX_FOR_LISTS
             else:
                 raise TypeError()
+
+            parameter_raw_proxy_node.type = raw_type_prefix + property_name
 
             for children_ast_node in list_of_children:
                 property_raw_node = children_ast_node.render_as_raw_ast_node()
@@ -62,7 +66,7 @@ class StatementSequence(ASTNode):
     def render_as_string(self) -> str:
         raise NotImplemented
 
-    def __init__(self, statements: List[ASTNode]):
+    def __init__(self, statements: List[ASTNode] = []):
         self.statements: List[ASTNode] = statements
 
     def render_as_lines(self) -> List[str]:
@@ -79,8 +83,8 @@ class UseSynth(ASTNode):
     def get_all_property_names(self) -> List[str]:
         return ['synth_name']
 
-    def __init__(self):
-        self.synth_name: Optional[ASTNode] = None
+    def __init__(self, synth_name: Optional[ASTNode] = None):
+        self.synth_name: Optional[ASTNode] = synth_name
 
     def render_as_lines(self) -> List[str]:
         return [f"use synth {self.synth_name.render_as_string()}"]
@@ -92,7 +96,9 @@ class UseSynth(ASTNode):
 
 class StringLiteral(ASTNode):
 
-    def __init__(self, value: str):
+    UNDEFINED = 'undefined'
+
+    def __init__(self, value: str = UNDEFINED):
         self.value: str = value
         pass
 
@@ -128,12 +134,12 @@ class ASTNodeFactory:
                     real_property_name = raw_property_name.replace(RAW_NODE_TYPE_PREFIX_FOR_SCALARS, '')
                     setattr(blank_node, real_property_name, self.create_ast_node_by_raw(raw_child.children[0]))
 
-                elif raw_property_name.startswith(RAW_NODE_TYPE_PREFIX_FOR_ARRAYS):
-                    real_property_name = raw_property_name.replace(RAW_NODE_TYPE_PREFIX_FOR_ARRAYS, '')
+                elif raw_property_name.startswith(RAW_NODE_TYPE_PREFIX_FOR_LISTS):
+                    real_property_name = raw_property_name.replace(RAW_NODE_TYPE_PREFIX_FOR_LISTS, '')
 
                     to_set_arr = []
                     for raw_subchild in raw_child.children:
-                        to_set_arr.append = self.create_ast_node_by_raw(raw_subchild)
+                        to_set_arr.append(self.create_ast_node_by_raw(raw_subchild))
 
                     setattr(blank_node, real_property_name, to_set_arr)
                 else:
