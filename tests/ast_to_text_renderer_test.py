@@ -1,7 +1,7 @@
 import unittest
 
 from sonic_pi_code_generator.lib.ast import StatementSequence, UseSynth, Define, Assignment, LValue, StringLiteral, \
-    NumericLiteral
+    NumericLiteral, Sleep
 
 
 class MyTestCase(unittest.TestCase):
@@ -53,6 +53,12 @@ class MyTestCase(unittest.TestCase):
 
         lines = assignment_with_numeric_literal.render_as_lines()
         self.assertEqual(['x = 123'], lines)
+
+    def test_sleep(self):
+        sleep = Sleep(duration=1.23)
+        self.assertEqual(
+            ['sleep 1.23'], sleep.render_as_lines()
+        )
 
 
 if __name__ == '__main__':
