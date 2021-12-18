@@ -1,6 +1,7 @@
 import unittest
 
-from sonic_pi_code_generator.lib.ast import StatementSequence, UseSynth, StringLiteral, ASTNodeFactory, Define
+from sonic_pi_code_generator.lib.ast import StatementSequence, UseSynth, StringLiteral, ASTNodeFactory, Define, Play, \
+    WithFx
 from sonic_pi_code_generator.lib.raw_ast import RawASTNode
 
 
@@ -22,26 +23,37 @@ class MyTestCase(unittest.TestCase):
                             UseSynth(
                                 synth_name=StringLiteral(value=":b")
                             ),
+                            WithFx(
+                                fx_name=StringLiteral(value=":echo"),
+                                statement_sequence=StatementSequence([
+                                    Play(note=StringLiteral('65'))
+                                ])
+                            )
                         ]
                     )
                 ),
                 UseSynth(
                     synth_name=StringLiteral(value=":5")
                 ),
+                Play(
+                    note=StringLiteral(value=str(63))
+                )
             ]
         )
 
         lines_before = sequence.render_as_lines()
-        self.assertEqual(
-            [
-                'use synth :tb303',
-                'define function do',
-                '  use synth :a',
-                '  use synth :b',
-                'done',
-                'use synth :5'
-            ],
-            lines_before)
+        self.assertEqual([
+            'use synth :tb303',
+            'define function do',
+            '  use synth :a',
+            '  use synth :b',
+            '  with :echo',
+            '    play 65',
+            '  done',
+            'done',
+            'use synth :5',
+            'play 63'
+        ], lines_before)
 
         raw_ast = sequence.render_as_raw_ast_node()
         self.assertIsInstance(raw_ast, RawASTNode)
