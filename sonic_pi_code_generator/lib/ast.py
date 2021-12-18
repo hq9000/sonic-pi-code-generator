@@ -41,5 +41,14 @@ class StatementSequence(ASTNode):
         return res
 
 
+class UseSynth(Statement):
+
+    def __init__(self, synth_name: str):
+        self.synth_name: str = synth_name
+
+    def render_as_lines(self) -> List[str]:
+        return [f"use synth {self.synth_name}"]
+
+
 class DoBlock(ASTNode):
     pass

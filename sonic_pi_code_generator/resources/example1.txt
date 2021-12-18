@@ -1,0 +1,25 @@
+define :my_loop do
+  use_synth :tb303
+  play choose(chord(:e3, :minor)), release: 0.2, cutoff: rrand(60, 80)
+  sleep 0.25
+end
+
+
+define :my_db do
+  sample :drum_bass_hard
+  sleep 0.25
+end
+
+in_thread(name: :looper) do
+  with_fx :echo do
+    loop do
+      my_loop
+    end
+  end
+end
+
+in_thread(name: :bd_loop) do
+  loop do
+    my_bd
+  end
+end
