@@ -65,6 +65,7 @@ class LValue(Expression):
     def render_as_string(self) -> str:
         return self.name
 
+
 class StringLiteral(Expression):
     def __init__(self, value: str):
         self.value: str = value
@@ -91,3 +92,11 @@ class Assignment(Statement):
         return [
             self.lvalue.render_as_string() + " = " + self.rvalue.render_as_string()
         ]
+
+
+class Sleep(Statement):
+    def __init__(self, duration: float):
+        self.duration: float = duration
+
+    def render_as_lines(self) -> List[str]:
+        return [f"sleep {str(self.duration)}"]
