@@ -28,10 +28,15 @@ class RawASTNode:
         for child in self.children:
             res += child.render_as_flat_ast_elements()
 
+        return res
+
     def has_children(self) -> bool:
         return len(self.children) > 0
 
     def has_right_sibling(self) -> bool:
+        if self.parent is None:
+            return False
+
         for i, child in enumerate(parents_children := self.parent.children):
             if child is self:
                 if i < len(parents_children) - 1:
@@ -39,6 +44,3 @@ class RawASTNode:
                 else:
                     return False
         raise Exception('child not found among its parent\'s children')
-
-
-class RawASTNodeFactory

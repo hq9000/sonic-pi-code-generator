@@ -56,6 +56,10 @@ class MyTestCase(unittest.TestCase):
         ], lines_before)
 
         raw_ast = sequence.render_as_raw_ast_node()
+
+        flat_ast = raw_ast.render_as_flat_ast_elements()
+        self.assertGreater(len(flat_ast), 20)
+
         self.assertIsInstance(raw_ast, RawASTNode)
 
         ast_factory = ASTNodeFactory()
@@ -64,6 +68,7 @@ class MyTestCase(unittest.TestCase):
         lines_after = restored.render_as_lines()
 
         self.assertEqual(lines_before, lines_after)
+
 
 
 if __name__ == '__main__':

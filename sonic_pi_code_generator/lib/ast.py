@@ -83,7 +83,7 @@ class StatementSequence(ASTNode):
 class UseSynth(ASTNode):
 
     def get_all_property_names(self) -> List[str]:
-        return ['fx_name']
+        return ['synth_name']
 
     def __init__(self, synth_name: Optional[ASTNode] = None):
         self.synth_name: Optional[ASTNode] = synth_name
@@ -129,7 +129,7 @@ class Play(ASTNode):
         return f"play {self.note.render_as_string()}"
 
     def get_all_property_names(self) -> List[str]:
-        pass
+        return ["note"]
 
 
 class Define(ASTNode):
