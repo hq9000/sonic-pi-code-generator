@@ -31,7 +31,6 @@ class ASTNode(ABC):
             parameter_raw_proxy_node = RawASTNode()
             this_raw_node.children.append(parameter_raw_proxy_node)
 
-
             parameter_raw_proxy_node.value = VALUE_EMPTY
             parameter_raw_proxy_node.parent = this_raw_node
 
@@ -84,7 +83,7 @@ class StatementSequence(ASTNode):
 class UseSynth(ASTNode):
 
     def get_all_property_names(self) -> List[str]:
-        return ['synth_name']
+        return ['fx_name']
 
     def __init__(self, synth_name: Optional[ASTNode] = None):
         self.synth_name: Optional[ASTNode] = synth_name
@@ -94,6 +93,44 @@ class UseSynth(ASTNode):
 
     def render_as_string(self) -> str:
         raise NotImplementedError()
+
+
+class WithFx(ASTNode):
+    def get_all_property_names(self) -> List[str]:
+        return ['fx_name', 'statement_sequence']
+
+    def __init__(self,
+                 fx_name: Optional[ASTNode] = None,
+                 statement_sequence: Optional[StatementSequence] = None
+                 ):
+        self.fx_name: Optional[ASTNode] = fx_name
+        self.statement_sequence: StatementSequence = [] if statement_sequence is None else statement_sequence
+
+    def render_as_lines(self) -> List[str]:
+        return [
+            f"with {self.fx_name.render_as_string()}",
+            *self._indent_lines(self.statement_sequence.render_as_lines()),
+            "done"
+        ]
+
+    def render_as_string(self) -> str:
+        raise NotImplementedError()
+
+
+class Play(ASTNode):
+
+    def __init__(self, note: Optional[ASTNode] = None):
+        self.note: Optional[ASTNode] = note
+
+    def render_as_lines(self) -> List[str]:
+        return [self.render_as_string()]
+
+    def render_as_string(self) -> str:
+        return f"play {self.note.render_as_string()}"
+
+    def get_all_property_names(self) -> List[str]:
+        pass
+
 
 class Define(ASTNode):
 
@@ -116,7 +153,6 @@ class Define(ASTNode):
 
 
 class StringLiteral(ASTNode):
-
     UNDEFINED = 'undefined'
 
     def __init__(self, value: str = UNDEFINED):
