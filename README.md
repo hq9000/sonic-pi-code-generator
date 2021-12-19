@@ -1,5 +1,12 @@
-import json
-import unittest
+# Sonic Pi code generator
+
+This tool has been made as an auxiliary tool 
+to generate enough data to be able to train neural
+networks for Sonic Pi code autocompletion during NASH2021 hackathon.  
+
+the best way to see what it does is to check this testcase code:
+
+```python
 
 from sonic_pi_code_generator.lib.ast_as_json_presenter import ASTAsJsonPresenter
 from sonic_pi_code_generator.lib.ast_generator import ASTGenerator
@@ -44,6 +51,4 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(decoded_json, expected_decoded_json)
 
-
-if __name__ == '__main__':
-    unittest.main()
+```
