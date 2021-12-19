@@ -1,7 +1,7 @@
 # Sonic Pi code generator
 
-This tool has been made as an auxiliary tool 
-to generate enough data to be able to train neural
+This code generator has been made as an auxiliary tool 
+to create enough data to be able to train neural
 networks for Sonic Pi code autocompletion during NASH2021 hackathon.  
 
 the best way to see what it does is to check this testcase code:
