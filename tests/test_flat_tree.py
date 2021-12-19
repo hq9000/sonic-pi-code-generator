@@ -48,8 +48,6 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(digest_after, digest_before)
 
-        pass
-
     def _create_flat_elements_digest(self, flat_elements: List[FlatASTElement]) -> List[Dict[str, str]]:
         res = []
         for element in flat_elements:
