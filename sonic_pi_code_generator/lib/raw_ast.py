@@ -27,20 +27,32 @@ class RawASTNode:
         self.children.append(new_child)
         new_child.parent = self
 
-    def render_as_flat_ast_elements(self) -> List[FlatASTElement]:
+    def render_as_flat_ast_elements(self, position_as_list: Optional[List[int]] = None) -> List[FlatASTElement]:
         # essentially it's an "in-order depth first traversal"
         # with putting "has children"
         # and "has right sibling" markers
         # as requested by https://arxiv.org/pdf/1711.09573.pdf
-        res = [FlatASTElement(
+
+        if position_as_list is None:
+            position_as_list = [0]
+
+        top_element = FlatASTElement(
+            position=position_as_list[0],  # position_as_list is passed as a list of one element in order to be mutable
             type=self.type,
             value=self.value,
             has_children=self.has_children(),
-            has_right_sibling=self.has_right_sibling()
-        )]
+            has_right_sibling=self.has_right_sibling(),
+            children_positions=[]
+        )
+
+        res = [top_element]
+
+        position_as_list[0] += 1
 
         for child in self.children:
-            res += child.render_as_flat_ast_elements()
+            top_element.children_positions.append(position_as_list[0])
+            flat_child_elements = child.render_as_flat_ast_elements(position_as_list)
+            res += flat_child_elements
 
         return res
 

@@ -29,14 +29,14 @@ class MyTestCase(unittest.TestCase):
         digest_before = self._create_flat_elements_digest(flat_elements)
 
         self.assertEqual(digest_before,
-                         [{'t': 't', 'v': '1', 'c': '1', 'rs': '0'},
-                          {'t': 't', 'v': '2', 'c': '1', 'rs': '1'},
-                          {'t': 't', 'v': '3', 'c': '1', 'rs': '1'},
-                          {'t': 't', 'v': '6', 'c': '0', 'rs': '0'},
-                          {'t': 't', 'v': '7', 'c': '0', 'rs': '1'},
-                          {'t': 't', 'v': '4', 'c': '0', 'rs': '0'},
-                          {'t': 't', 'v': '8', 'c': '0', 'rs': '1'},
-                          {'t': 't', 'v': '5', 'c': '0', 'rs': '0'}])
+                         [{'p': 0, 't': 't', 'v': '1', 'c': '1', 'rs': '0', 'cp': [1, 6, 7]},
+                          {'p': 1, 't': 't', 'v': '2', 'c': '1', 'rs': '1', 'cp': [2, 4, 5]},
+                          {'p': 2, 't': 't', 'v': '3', 'c': '1', 'rs': '1', 'cp': [3]},
+                          {'p': 3, 't': 't', 'v': '6', 'c': '0', 'rs': '0', 'cp': []},
+                          {'p': 4, 't': 't', 'v': '7', 'c': '0', 'rs': '1', 'cp': []},
+                          {'p': 5, 't': 't', 'v': '4', 'c': '0', 'rs': '0', 'cp': []},
+                          {'p': 6, 't': 't', 'v': '8', 'c': '0', 'rs': '1', 'cp': []},
+                          {'p': 7, 't': 't', 'v': '5', 'c': '0', 'rs': '0', 'cp': []}])
 
         self.assertEqual(len(flat_elements), 8)
 
@@ -52,10 +52,12 @@ class MyTestCase(unittest.TestCase):
         res = []
         for element in flat_elements:
             res.append({
+                "p": element.position,
                 "t": element.type,
                 "v": element.value,
                 "c": "1" if element.has_children else "0",
-                "rs": "1" if element.has_right_sibling else "0"
+                "rs": "1" if element.has_right_sibling else "0",
+                "cp": element.children_positions
             })
 
         return res
